@@ -18,6 +18,9 @@ public abstract class BeerOrderLineMapperDecorator implements BeerOrderLineMappe
     private BeerOrderLineMapper beerOrderLineMapper;
 
     @Autowired
+    private DateMapper dateMapper;
+
+    @Autowired
     public void setBeerService(BeerService beerService) {
         this.beerService = beerService;
     }
@@ -41,5 +44,24 @@ public abstract class BeerOrderLineMapperDecorator implements BeerOrderLineMappe
         });
 
         return orderLineDto;
+    }
+
+    @Override
+    public BeerOrderLine dtoToBeerOrderLine(BeerOrderLineDto dto) {
+        if (dto == null) return null;
+
+        final BeerOrderLine.BeerOrderLineBuilder beerOrderLine = BeerOrderLine.builder();
+
+        beerOrderLine.id(dto.getId());
+        if (dto.getVersion() != null) {
+            beerOrderLine.version(dto.getVersion().longValue());
+        }
+        beerOrderLine.createdDate(dateMapper.asTimestamp(dto.getCreatedDate()));
+        beerOrderLine.lastModifiedDate(dateMapper.asTimestamp(dto.getLastModifiedDate()));
+        beerOrderLine.beerId(dto.getBeerId());
+        beerOrderLine.upc(dto.getUpc());
+        beerOrderLine.orderQuantity(dto.getOrderQuantity());
+
+        return beerOrderLine.build();
     }
 }
